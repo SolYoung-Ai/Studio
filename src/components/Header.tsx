@@ -28,16 +28,12 @@ interface INavItem {
 
 const NAV_ITEMS: INavItem[] = [
   { zh: '服务', en: 'Services', path: '/services' },
-  { zh: '产品', en: 'Products', path: '/products' },
   { zh: '社区', en: 'Community', path: 'https://solhub.solyoung.top/', external: true },
   { zh: '联系我', en: 'Contact', path: '/contact' },
 ];
 
 function useNavActive(item: INavItem): boolean {
   const { pathname } = useLocation();
-  if (item.path === '/products') {
-    return pathname.startsWith('/products');
-  }
   return pathname.startsWith(item.path);
 }
 

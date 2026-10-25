@@ -9,22 +9,6 @@ export default function Footer() {
   const { t } = useLang();
   const groups = [
     {
-      key: 'footer.content',
-      items: [
-        { label: t('footer.allProducts'), to: '/products' },
-        { label: t('footer.changelog'), to: '/updates' },
-      ],
-    },
-    {
-      key: 'footer.help',
-      items: [
-        { label: t('footer.buyGuide'), to: '/purchase-guide' },
-        { label: t('footer.faq'), to: '/faq' },
-        { label: t('footer.privacy'), to: '/privacy' },
-        { label: t('footer.terms'), to: '/terms' },
-      ],
-    },
-    {
       key: 'footer.contact',
       items: [
         { label: t('footer.contactUs'), to: '/contact' },
@@ -36,7 +20,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-border">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr]">
           <div className="space-y-3">
             <div className="font-display text-base font-bold tracking-[0.16em]">
               SOLYOUNG<span className="text-accent">.</span>STUDIO
