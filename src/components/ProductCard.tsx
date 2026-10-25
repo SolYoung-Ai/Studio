@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { IProduct } from '@/data/products';
+import { useLang } from '@/i18n';
+import { assetUrl } from '@/lib/base';
 import ProductVisual from '@/components/ProductVisual';
 import StatusBadge from '@/components/StatusBadge';
 
@@ -11,6 +13,9 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, className }: ProductCardProps) {
+  const { t } = useLang();
+  const hasPreview = Boolean(product.previewImage);
+
   return (
     <Link
       to={`/products/${product.slug}`}
@@ -19,15 +24,27 @@ export default function ProductCard({ product, className }: ProductCardProps) {
         className,
       )}
     >
-      <div className="overflow-hidden p-4 pb-0">
-        <div className="transition-transform duration-300 ease-out group-hover:scale-[1.015]">
-          <ProductVisual
-            variant={product.cover}
-            sku={product.sku}
-            status={product.status}
+      {hasPreview ? (
+        <div className="relative aspect-[16/10] overflow-hidden border-b border-border bg-muted/30">
+          <img
+            src={assetUrl(product.previewImage!)}
+            alt={`${product.name} 首页预览`}
+            loading="lazy"
+            className="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03]"
           />
         </div>
-      </div>
+      ) : (
+        <div className="overflow-hidden p-4 pb-0">
+          <div className="transition-transform duration-300 ease-out group-hover:scale-[1.015]">
+            <ProductVisual
+              variant={product.cover}
+              sku={product.sku}
+              status={product.status}
+              coverImage={product.coverImage}
+            />
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-1 flex-col gap-2 p-4 sm:p-5">
         <div className="flex items-center justify-between gap-2">
@@ -37,9 +54,20 @@ export default function ProductCard({ product, className }: ProductCardProps) {
           <StatusBadge status={product.status} />
         </div>
 
-        <h3 className="font-display text-lg font-semibold tracking-tight">
-          {product.name}
-        </h3>
+        <div className="flex items-center gap-2.5">
+          {product.coverImage ? (
+            <img
+              src={assetUrl(product.coverImage)}
+              alt=""
+              aria-hidden
+              loading="lazy"
+              className="size-7 shrink-0 rounded-sm border border-border object-cover"
+            />
+          ) : null}
+          <h3 className="font-display text-lg font-semibold tracking-tight">
+            {product.name}
+          </h3>
+        </div>
         <p className="line-clamp-2 flex-1 text-[13px] leading-relaxed text-muted-foreground">
           {product.summary}
         </p>
@@ -53,7 +81,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
             )}
           </span>
           <span className="inline-flex items-center gap-1 text-[13px] text-foreground transition-colors group-hover:text-accent">
-            查看详情
+            {product.externalUrl ? t('works.openInUse') : t('works.viewDetail')}
             <ArrowRight
               aria-hidden
               className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5"

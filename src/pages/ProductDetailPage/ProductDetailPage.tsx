@@ -3,6 +3,8 @@ import { ArrowRight, Check, ChevronRight } from 'lucide-react';
 import { getProductBySlug, PRODUCTS } from '@/data/products';
 import { DEMO_MODE } from '@/data/payments';
 import { UPDATES } from '@/data/updates';
+import { useLang } from '@/i18n';
+import { assetUrl } from '@/lib/base';
 import ProductVisual from '@/components/ProductVisual';
 import StatusBadge from '@/components/StatusBadge';
 import UpdateList from '@/components/UpdateList';
@@ -22,6 +24,7 @@ interface IBlock {
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { t } = useLang();
   const product = slug ? getProductBySlug(slug) : undefined;
 
   if (!product) {
@@ -71,12 +74,23 @@ export default function ProductDetailPage() {
       {/* 商品主体 */}
       <div className="mt-8 grid gap-10 lg:grid-cols-[1.05fr_1fr]">
         <div className="lg:sticky lg:top-24 lg:self-start">
-          <ProductVisual
-            variant={product.cover}
-            sku={product.sku}
-            status={product.status}
-            className="max-w-2xl"
-          />
+          {product.previewImage ? (
+            <div className="max-w-2xl overflow-hidden border border-border bg-muted/30">
+              <img
+                src={assetUrl(product.previewImage)}
+                alt={`${product.name} 首页预览`}
+                className="aspect-[16/10] w-full object-cover object-top"
+              />
+            </div>
+          ) : (
+            <ProductVisual
+              variant={product.cover}
+              sku={product.sku}
+              status={product.status}
+              coverImage={product.coverImage}
+              className="max-w-2xl"
+            />
+          )}
         </div>
 
         <div className="flex flex-col gap-6">
@@ -103,7 +117,20 @@ export default function ProductDetailPage() {
 
           {/* 购买入口 */}
           <div className="space-y-3">
-            {product.purchasable ? (
+            {product.externalUrl ? (
+              <>
+                <Button asChild size="lg" className="w-full sm:w-auto">
+                  <a href={product.externalUrl} target="_blank" rel="noopener noreferrer">
+                    {t('works.openInUse')}
+                    <ArrowRight aria-hidden className="ml-1.5 size-4" />
+                  </a>
+                </Button>
+                <div className="flex items-start gap-2 border border-border bg-muted/40 px-3 py-2.5 text-[13px] leading-relaxed text-muted-foreground">
+                  <span aria-hidden className="mt-1 size-1.5 shrink-0 rounded-full bg-muted-foreground/60" />
+                  <span>{t('product.openNote')}</span>
+                </div>
+              </>
+            ) : product.purchasable ? (
               <>
                 <Button
                   size="lg"
@@ -125,7 +152,11 @@ export default function ProductDetailPage() {
             ) : (
               <div className="flex items-start gap-2 border border-border bg-muted/40 px-3 py-2.5 text-[13px] leading-relaxed text-muted-foreground">
                 <span aria-hidden className="mt-1 size-1.5 shrink-0 rounded-full bg-muted-foreground/60" />
-                <span>暂不开放购买。完整说明与权益将在正式上线前补充。</span>
+                <span>
+                  {product.status === 'testing'
+                    ? '正在内测，暂未开放。正式开放后会在这里更新入口与使用方式。'
+                    : '暂不开放。完整说明与权益将在正式上线前补充。'}
+                </span>
               </div>
             )}
           </div>

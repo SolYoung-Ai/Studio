@@ -1,10 +1,13 @@
 import { cn } from '@/lib/utils';
+import { assetUrl } from '@/lib/base';
 import { PRODUCT_STATUS_META, type IProductStatus } from '@/data/products';
 
 interface ProductVisualProps {
   variant: 'invite-card' | 'placeholder';
   sku: string;
   status: IProductStatus;
+  /** 真实封面图（public 相对路径）；有值时优先渲染 */
+  coverImage?: string;
   className?: string;
 }
 
@@ -15,10 +18,29 @@ function CornerMark({ className }: { className: string }) {
 
 /**
  * 产品视觉：
+ * - coverImage：真实产品封面图（logo / 界面图）
  * - invite-card：原创静态邀请卡视觉（品牌感、无真实邀请码、无虚假界面截图）
  * - placeholder：制作中/规划中的诚实占位（编号 + 状态，不伪造产品图）
  */
-export default function ProductVisual({ variant, sku, status, className }: ProductVisualProps) {
+export default function ProductVisual({ variant, sku, status, coverImage, className }: ProductVisualProps) {
+  if (coverImage) {
+    return (
+      <div
+        className={cn(
+          'relative flex aspect-square w-full items-center justify-center overflow-hidden border border-border bg-card',
+          className,
+        )}
+      >
+        <img
+          src={assetUrl(coverImage)}
+          alt={sku}
+          loading="lazy"
+          className="h-full w-full object-contain p-[6%]"
+        />
+      </div>
+    );
+  }
+
   if (variant === 'invite-card') {
     return (
       <div

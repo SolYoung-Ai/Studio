@@ -1,60 +1,63 @@
-import { DEMO_MODE } from '@/data/payments';
 import { SITE_CONFIG } from '@/data/site';
 import InfoPageLayout, { InfoSection } from '@/components/InfoPageLayout';
+import { useLang } from '@/i18n';
 
 export default function TermsPage() {
+  const { lang } = useLang();
+  const en = lang === 'en';
   return (
     <InfoPageLayout
       kicker="Terms"
-      title="服务条款"
-      description="使用本站与购买商品前，请阅读以下条款。条款由站长确认后生效，未尽事宜以站长公布的最新说明为准。"
+      title={en ? 'Terms' : '服务条款'}
+      description={
+        en
+          ? 'The ground rules for working with this site. Continued use means you accept the latest version.'
+          : '使用本站前请阅读。条款以本站最新公布为准。'
+      }
     >
-      <InfoSection label="01 · 站点性质">
+      <InfoSection label={en ? '01 · Scope of work' : '01 · 工作范围'}>
         <p>
-          本站是独立创作者 {SITE_CONFIG.ownerName} 的数字作品工作室，展示并销售经实际制作与验证的数字产品。
-          商品状态（在售 / 演示商品 / 制作中 / 规划中）与价格以商品详情页为准，未开放购买的商品不提供购买入口。
+          {en
+            ? 'For personal website and brand collaborations, the deliverable scope is whatever we confirm in writing before work starts. Unconfirmed pages or features are not automatically included.'
+            : '个人网站与品牌合作的交付范围，以双方书面确认的方案为准。未确认的页面与功能不自动包含。'}
         </p>
       </InfoSection>
 
-      <InfoSection label="02 · 交易方式">
+      <InfoSection label={en ? '02 · Changes & revisions' : '02 · 修改与变更'}>
         <p>
-          本站采用真实收款二维码 + 人工核验的交易方式，不提供自动支付确认。
-          只有人工确认收款后，才会按商品说明交付相应权益；前端按钮不会直接改变交付状态。
-        </p>
-        {DEMO_MODE ? (
-          <p className="border-l-2 border-warning/50 pl-3 text-warning">
-            当前为演示模式，不产生真实交易、不发放真实权益，示例价格不代表最终售价。
-          </p>
-        ) : null}
-      </InfoSection>
-
-      <InfoSection label="03 · 知识产权">
-        <p>
-          本站作品及其交付内容的知识产权归 {SITE_CONFIG.ownerName} 所有。未经许可，
-          不得复制、转售、公开传播或以其他方式盗用交付内容（包括邀请码与授权权益）。
+          {en
+            ? 'Major new features or direction changes are a new scope and are re-quoted. Revision rounds and acceptance criteria are agreed upfront — revisions are not unlimited.'
+            : '新增重大功能或改变方向属于新范围，需重新报价。修改轮次与验收标准在合作前明确，不是无限修改。'}
         </p>
       </InfoSection>
 
-      <InfoSection label="04 · 使用限制">
-        <ul className="list-disc space-y-1.5 pl-5">
-          <li>邀请码类商品限购 1 个，仅供本人使用。</li>
-          <li>数字资源的使用范围、授权期限与是否允许转让，以商品详情页说明为准。</li>
-          <li>不得将订单参考号、邀请码用于非法或未授权用途。</li>
-        </ul>
-      </InfoSection>
-
-      <InfoSection label="05 · 免责与售后">
+      <InfoSection label={en ? '03 · Costs not included' : '03 · 不包含的费用'}>
         <p>
-          数字商品一经交付，售后规则按商品详情页公布的退款及售后说明执行。
-          因用户自身原因（如信息填写错误、未保留支付记录）导致的交付延迟或失败，站长不承担相应责任，
-          但会尽力协助解决。
+          {en
+            ? 'Domain, hosting, third-party subscriptions and API costs are billed separately and are not included in the service fee unless agreed in writing. Launching a site does not mean lifetime free maintenance.'
+            : '域名、服务器、第三方订阅与 API 费用按实约定，不默认包含在服务费中。网站上线不等于永久免费维护。'}
         </p>
       </InfoSection>
 
-      <InfoSection label="06 · 条款更新">
+      <InfoSection label={en ? '04 · Brand collaboration' : '04 · 品牌合作'}>
         <p>
-          本站可随时更新本条款，更新后将在本页公布。继续使用本站即视为接受最新条款。
-          如有疑问，可通过 {SITE_CONFIG.ownerEmail} 联系站长。
+          {en
+            ? 'No traffic, conversion or other performance numbers are promised. Format, scope and rights are agreed in writing before execution.'
+            : '不承诺流量、转化等效果指标。合作形式、范围与权益在执行前以书面约定为准。'}
+        </p>
+      </InfoSection>
+
+      <InfoSection label={en ? '05 · Intellectual property' : '05 · 知识产权'}>
+        <p>
+          {en
+            ? `Custom work is licensed to you within the agreed scope after final payment. ${SITE_CONFIG.ownerName} retains the right to show the work as a portfolio case unless otherwise agreed in writing.`
+            : `定制作品在尾款结清后，客户获得约定范围内的使用权；${SITE_CONFIG.ownerName} 保留将该作品作为个人案例展示的权利，另有保密约定的除外。`}
+        </p>
+      </InfoSection>
+
+      <InfoSection label={en ? '06 · Contact' : '06 · 联系'}>
+        <p>
+          {en ? <>Questions: {SITE_CONFIG.ownerEmail}.</> : <>如有疑问，可通过 {SITE_CONFIG.ownerEmail} 联系站长。</>}
         </p>
       </InfoSection>
     </InfoPageLayout>

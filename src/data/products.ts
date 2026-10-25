@@ -1,11 +1,23 @@
-// EXPORTS: IProductStatus, IProduct, PRODUCT_STATUS_META, PRODUCTS, PRODUCT_CATEGORIES, getProductBySlug
+// EXPORTS: IProductStatus, IProduct, IProductTier, PRODUCT_TIER_META, PRODUCTS, PRODUCT_TIERS, getProductBySlug
 
 /**
  * 商品统一配置 —— 数据驱动，站长只需修改此文件（或替换封面视觉变体）即可上架/下架商品。
  * 所有价格、状态、权益必须真实可交付，未确定的信息一律不编造。
  */
 
-export type IProductStatus = 'onsale' | 'demo' | 'making' | 'planning';
+export type IProductStatus = 'live' | 'testing' | 'making' | 'planning' | 'demo';
+
+/** 分区：free 永久免费 / paid 付费 / beta 测试中（完善后可能转付费） */
+export type IProductTier = 'free' | 'paid' | 'beta';
+
+export const PRODUCT_TIER_META: Record<
+  IProductTier,
+  { label: string; labelEn: string }
+> = {
+  free: { label: '免费', labelEn: 'FREE' },
+  paid: { label: '付费', labelEn: 'PAID' },
+  beta: { label: '测试', labelEn: 'BETA' },
+};
 
 export interface IProductStatusMeta {
   label: string;
@@ -15,10 +27,11 @@ export interface IProductStatusMeta {
 }
 
 export const PRODUCT_STATUS_META: Record<IProductStatus, IProductStatusMeta> = {
-  onsale: { label: '在售', labelEn: 'ON SALE', tone: 'accent' },
-  demo: { label: '演示商品', labelEn: 'DEMO', tone: 'warning' },
+  live: { label: '已上线', labelEn: 'LIVE', tone: 'accent' },
+  testing: { label: '测试中', labelEn: 'IN TESTING', tone: 'warning' },
   making: { label: '制作中', labelEn: 'IN PROGRESS', tone: 'muted' },
   planning: { label: '规划中', labelEn: 'PLANNED', tone: 'muted' },
+  demo: { label: '演示商品', labelEn: 'DEMO', tone: 'warning' },
 };
 
 export interface IProduct {
@@ -31,6 +44,8 @@ export interface IProduct {
   category: string;
   /** 分类（英文档案标签） */
   categoryEn: string;
+  /** 所属分区：free 免费 / paid 付费 / beta 测试 */
+  tier: IProductTier;
   status: IProductStatus;
   /** 价格文案；未定价用 '待定' */
   priceLabel: string;
@@ -65,106 +80,117 @@ export interface IProduct {
   demoMode: boolean;
   /** 限购数量（邀请码类默认 1） */
   maxQty: number;
-  /** 封面视觉变体 */
+  /** 封面视觉变体（无真实封面图时使用） */
   cover: 'invite-card' | 'placeholder';
+  /** 真实封面图（public 下相对路径）；有值时优先用图片 */
+  coverImage?: string;
+  /** 工具首页实时截图（横版预览图，public 下相对路径）；有值时卡片主视觉用它 */
+  previewImage?: string;
+  /** 外链地址（已有工具直接跳转主站对应页）；有值时主按钮为"打开使用" */
+  externalUrl?: string;
 }
 
 export const PRODUCTS: IProduct[] = [
   {
-    slug: 'sy-test-001',
-    sku: 'SY-TEST-001',
-    name: 'SolYoung Studio 内测邀请码',
-    category: '邀请码',
-    categoryEn: 'Early Access',
-    status: 'demo',
-    priceLabel: '¥9.90',
-    price: 9.9,
-    version: '0.1.0',
-    summary: '一次围绕数字作品与原创工具的内测体验，用于测试 SolYoung Studio 的购买与邀请码交付流程。',
-    description:
-      '该商品用于测试 SolYoung Studio 的购买与邀请码交付流程。正式销售前，将明确可兑换的产品、使用权限、有效期限和相关限制。具体权益以最终发布的商品说明为准。',
-    includes: [
-      '人工核验后交付一枚内测邀请码（当前演示模式不发放真实邀请码）',
-      '进入 SolYoung Studio 内测讨论与反馈渠道（正式上线后开放）',
-    ],
-    audience:
-      '希望提前体验 SolYoung Studio 数字工具与创作资源的早期用户；也用于验证购买、付款与人工核验流程是否顺畅。',
-    usage:
-      '购买并完成人工核验后，将收到邀请码与使用说明。按说明在对应入口兑换即可。所需工具与步骤将在正式上线前随商品说明一并公布。',
-    delivery: '人工核验确认收款后，通过官方客服渠道发送邀请码。',
-    license: '内测邀请码仅供本人使用，不得转售或公开传播（正式规则以上线后的商品说明为准）。',
-    updatePolicy: '邀请码对应的产品权益以上线时公布的说明为准，当前版本不承诺额外更新。',
-    limitations: ['演示模式不发放真实邀请码', '限购 1 个', '当前仅用于流程测试，不代表最终售价或权益'],
-    purchaseNotes: [
-      '当前为演示商品，不会产生真实收款，也不会发放真实邀请码。',
-      '示例价格 ¥9.90 仅用于测试界面，不代表最终的实际售价。',
-      '正式销售前，具体权益、有效期限与相关限制将以最终发布的商品说明为准。',
-    ],
-    refundPolicy:
-      '演示模式不涉及真实交易，不适用退款。正式上线后，未核验交付的订单支持申请退款；已交付邀请码的订单按届时公布的售后规则处理。',
-    purchasable: true,
-    demoMode: true,
-    maxQty: 1,
-    cover: 'invite-card',
-  },
-  {
-    slug: 'ai-resource-pack',
-    sku: 'SY-ASSET-001',
-    name: 'AI 创作资源包',
-    category: '资源',
-    categoryEn: 'Resources',
-    status: 'making',
-    priceLabel: '待定',
-    price: null,
-    version: '—',
-    summary: '一份关于 AI 创作的可交付资源合集。暂不开放购买。',
-    description:
-      '该资源包正在制作中，暂不开放购买。只有实际准备好可交付的内容之后，才会改为在售。完整说明将在正式上线前补充。',
-    includes: [],
-    audience: '待补充',
-    usage: '待补充',
-    delivery: '待补充',
-    license: '待补充',
-    updatePolicy: '待补充',
-    limitations: ['暂不开放购买', '内容与价格未确定'],
-    purchaseNotes: ['制作完成并确认可交付后，才会开放购买。'],
-    refundPolicy: '暂不适用（未开放购买）。',
-    purchasable: false,
-    demoMode: false,
-    maxQty: 1,
-    cover: 'placeholder',
-  },
-  {
-    slug: 'pro-tools-license',
-    sku: 'SY-TOOL-001',
-    name: '数字工具 Pro 授权',
+    slug: 'my-os',
+    sku: 'SY-OS-001',
+    name: 'My.OS 个人创作操作系统',
     category: '工具',
     categoryEn: 'Tools',
-    status: 'planning',
-    priceLabel: '待定',
+    tier: 'free',
+    status: 'live',
+    priceLabel: '免费',
     price: null,
-    version: '—',
-    summary: '未来可能提供的高级工具授权。仅作规划展示。',
+    version: '1.0',
+    summary: '记录、思考、创作、发布、归档——把日常想法组织成自己的系统。',
     description:
-      '仅展示未来可能提供的高级工具授权方向。当前不提供任何具体功能、价格或购买入口，不会虚构不存在的高级功能。',
-    includes: [],
-    audience: '待补充',
-    usage: '待补充',
-    delivery: '待补充',
-    license: '待补充',
-    updatePolicy: '待补充',
-    limitations: ['仅规划展示，不开放购买', '不承诺具体功能与时间表'],
-    purchaseNotes: ['正式推出前不会开放任何购买入口。'],
-    refundPolicy: '暂不适用（未开放购买）。',
+      'My.OS 是一套个人创作操作系统，把记录、思考、创作、发布和归档收拢在同一个入口。它不追求一次性做完，而是随着你的使用慢慢长成自己的样子。',
+    includes: [
+      '记录与思考的统一入口',
+      '作品归档与发布的个人主页',
+      '免费在线使用，无需注册',
+    ],
+    audience: '有持续记录与创作习惯、希望把散落的想法整理成个人系统的人。',
+    usage: '浏览器直接打开即可使用，无需注册账号。',
+    delivery: '在线工具，打开即用。',
+    license: '免费使用。',
+    updatePolicy: '随主站持续迭代更新。',
+    limitations: ['免费在线使用', '个人数据保存在本地浏览器'],
+    purchaseNotes: [],
+    refundPolicy: '免费工具，不涉及交易。',
     purchasable: false,
     demoMode: false,
     maxQty: 1,
     cover: 'placeholder',
+    coverImage: 'products/my-os.webp',
+    previewImage: 'products/my-os-preview.webp',
+    externalUrl: 'https://solyoung.top/os/',
+  },
+  {
+    slug: 'verity',
+    sku: 'SY-VERITY-001',
+    name: 'Verity 人格测试集合站',
+    category: '工具',
+    categoryEn: 'Tools',
+    tier: 'free',
+    status: 'live',
+    priceLabel: '免费',
+    price: null,
+    version: '2.0',
+    summary: '聚合 13 套人格测试的在线测试集合站，选一套就能开始测。',
+    description:
+      'Verity 把 13 套人格测试收拢在一个站点，选一套就能开始，结果即时可见。适合想了解自己、或单纯喜欢做人格测试的人。',
+    includes: ['13 套人格测试在线作答', '即时生成结果', '免费使用，无需注册'],
+    audience: '想了解自己、或喜欢做人格测试的人。',
+    usage: '浏览器打开即测，无需注册账号。',
+    delivery: '在线工具。',
+    license: '免费使用。',
+    updatePolicy: '随主站持续更新测试内容。',
+    limitations: ['免费在线使用', '结果仅供参考娱乐'],
+    purchaseNotes: [],
+    refundPolicy: '免费工具，不涉及交易。',
+    purchasable: false,
+    demoMode: false,
+    maxQty: 1,
+    cover: 'placeholder',
+    coverImage: 'products/verity.webp',
+    previewImage: 'products/verity-preview.webp',
+    externalUrl: 'https://solyoung.top/Verity/',
+  },
+  {
+    slug: 'camsim',
+    sku: 'SY-CAMSIM-001',
+    name: 'CamSim 相机参数模拟器',
+    category: '工具',
+    categoryEn: 'Tools',
+    tier: 'free',
+    status: 'live',
+    priceLabel: '免费',
+    price: null,
+    version: '1.0',
+    summary: '从拍摄目标反向推导摄影参数的决策工具。',
+    description:
+      '相机参数模拟器：你告诉它你想拍成什么样，它帮你推导出光圈、快门、ISO 等参数，帮刚入门的人不再纠结拨轮怎么设。',
+    includes: ['按拍摄目标反推光圈 / 快门 / ISO', '摄影参数决策辅助', '免费在线使用'],
+    audience: '刚入门、不确定参数怎么设的摄影学习者。',
+    usage: '浏览器打开即可使用，无需注册。',
+    delivery: '在线工具。',
+    license: '免费使用。',
+    updatePolicy: '随主站持续迭代。',
+    limitations: ['免费在线使用', '参数结果仅供参考'],
+    purchaseNotes: [],
+    refundPolicy: '免费工具，不涉及交易。',
+    purchasable: false,
+    demoMode: false,
+    maxQty: 1,
+    cover: 'placeholder',
+    coverImage: 'products/camsim.webp',
+    previewImage: 'products/camsim-preview.webp',
+    externalUrl: 'https://solyoung.top/CamSim/',
   },
 ];
 
-export const PRODUCT_CATEGORIES = ['全部', '邀请码', '资源', '工具'] as const;
-export type IProductCategory = (typeof PRODUCT_CATEGORIES)[number];
+export const PRODUCT_TIERS: IProductTier[] = ['free', 'paid', 'beta'];
 
 export function getProductBySlug(slug: string): IProduct | undefined {
   return PRODUCTS.find((p) => p.slug === slug);

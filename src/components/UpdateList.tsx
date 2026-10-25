@@ -23,19 +23,11 @@ export default function UpdateList({ items, showLink = true }: UpdateListProps) 
         <li key={item.id} className="group flex flex-col gap-2 py-4 sm:flex-row sm:items-baseline sm:gap-6">
           <div className="flex shrink-0 items-center gap-3 font-mono text-xs uppercase tracking-[0.12em] text-muted-foreground sm:w-36">
             <span>{item.date}</span>
-            {item.isSample ? (
-              <span className="border border-warning/50 px-1.5 py-0.5 text-[10px] tracking-[0.08em] text-warning">
-                示例
-              </span>
-            ) : null}
           </div>
           <div className="flex flex-1 items-baseline justify-between gap-4">
-            <div>
-              <div className="text-[13px] font-medium text-foreground">{item.product}</div>
-              <p className="mt-0.5 text-[13px] leading-relaxed text-muted-foreground">
-                {item.content}
-              </p>
-            </div>
+            <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-foreground/85">
+              {item.content}
+            </p>
             {showLink ? (
               <Link
                 to="/updates"

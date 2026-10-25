@@ -2,6 +2,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { ExternalLink, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SITE_CONFIG } from '@/data/site';
+import { useLang } from '@/i18n';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -13,6 +14,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import ThemeToggle from '@/components/ThemeToggle';
+import LangToggle from '@/components/LangToggle';
 
 interface INavItem {
   zh: string;
@@ -20,39 +22,35 @@ interface INavItem {
   path: string;
   /** 该导航项是否以 search 参数区分激活态 */
   queryKey?: string;
+  /** 外链：用 <a> 新窗口打开 */
+  external?: boolean;
 }
 
 const NAV_ITEMS: INavItem[] = [
-  { zh: '产品', en: 'PRODUCTS', path: '/products' },
-  { zh: '资源', en: 'RESOURCES', path: '/products?cat=资源', queryKey: 'cat=资源' },
-  { zh: '购买说明', en: 'GUIDE', path: '/purchase-guide' },
+  { zh: '服务', en: 'Services', path: '/services' },
+  { zh: '产品', en: 'Products', path: '/products' },
+  { zh: '社区', en: 'Community', path: 'https://solhub.solyoung.top/', external: true },
+  { zh: '联系我', en: 'Contact', path: '/contact' },
 ];
 
 function useNavActive(item: INavItem): boolean {
-  const { pathname, search } = useLocation();
-  if (item.queryKey) {
-    return pathname === '/products' && search.includes(item.queryKey);
-  }
+  const { pathname } = useLocation();
   if (item.path === '/products') {
-    return pathname === '/products' && !search.includes('cat=');
+    return pathname.startsWith('/products');
   }
   return pathname.startsWith(item.path);
 }
 
 function NavItem({ item }: { item: INavItem }) {
   const active = useNavActive(item);
-  return (
-    <NavLink
-      to={item.path}
-      className={cn(
-        'group relative flex flex-col items-start px-3 py-2 text-sm transition-colors',
-        active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
-      )}
-    >
-      <span className="leading-none">{item.zh}</span>
-      <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.2em] opacity-70">
-        {item.en}
-      </span>
+  const { lang } = useLang();
+  const cls = cn(
+    'group relative flex items-center px-3 py-2 text-sm transition-colors',
+    active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
+  );
+  const inner = (
+    <>
+      <span className="leading-none">{lang === 'zh' ? item.zh : item.en}</span>
       <span
         aria-hidden
         className={cn(
@@ -60,11 +58,33 @@ function NavItem({ item }: { item: INavItem }) {
           active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100',
         )}
       />
+    </>
+  );
+  if (item.external) {
+    return (
+      <a href={item.path} target="_blank" rel="noreferrer" className={cls}>
+        {inner}
+      </a>
+    );
+  }
+  return (
+    <NavLink to={item.path} className={cls}>
+      {inner}
     </NavLink>
   );
 }
 
+function HeaderControls() {
+  return (
+    <div className="flex items-center gap-0.5">
+      <ThemeToggle />
+      <LangToggle />
+    </div>
+  );
+}
+
 export default function Header() {
+  const { t } = useLang();
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:h-16">
@@ -85,16 +105,16 @@ export default function Header() {
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            返回主站
+            {t('nav.backToMain')}
             <ExternalLink aria-hidden className="size-3.5" />
           </a>
           <div className="ml-2 border-l border-border pl-2">
-            <ThemeToggle />
+            <HeaderControls />
           </div>
         </nav>
 
         <div className="flex items-center gap-1 lg:hidden">
-          <ThemeToggle />
+          <HeaderControls />
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="打开菜单">
@@ -123,7 +143,7 @@ export default function Header() {
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    返回主站
+                    {t('nav.backToMain')}
                     <ExternalLink aria-hidden className="size-3.5" />
                   </a>
                 </SheetClose>

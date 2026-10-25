@@ -19,6 +19,8 @@ export interface ISiteConfig {
   ownerEmail: string;
   /** 微信客服二维码图片（public 下相对路径）；未配置为 null，页面显示占位 */
   wechatContactQr: string | null;
+  /** 微信客服 ID */
+  wechatId: string;
   /** 人工核验渠道说明 */
   verificationNote: string;
 }
@@ -30,7 +32,8 @@ export const SITE_CONFIG: ISiteConfig = {
   mainSiteUrl: 'https://solyoung.top/',
   ownerName: 'SolYoung',
   ownerEmail: 'soyoang@outlook.com',
-  wechatContactQr: null,
+  wechatContactQr: 'wechat-qr.jpg',
+  wechatId: 'solyoung-ai',
   verificationNote:
     '本页面无法自动确认转账。请将订单参考号、商品名称及必要的付款信息发送给官方客服，核验通过后按商品说明交付相应权益。',
 };
